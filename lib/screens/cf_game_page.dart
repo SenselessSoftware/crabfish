@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../cf_constants.dart';
-import 'cf_board_widget.dart';
-import 'cf_dice_widget.dart';
-import 'cf_players_widget.dart';
+import '../widgets/cf_board_widget.dart';
+import '../widgets/cf_dice_widget.dart';
+import '../widgets/cf_players_widget.dart';
 import 'money_wheel.dart';
 
 class CfGamePage extends StatefulWidget {
