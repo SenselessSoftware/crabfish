@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../cf_constants.dart';
 import '../models/cf_game.dart';
 
-/*
 class CfSelectAvatarScreen extends StatefulWidget { // ignore: must_be_immutable
   CfSelectAvatarScreen({super.key, this.userId});
   int? userId;
@@ -116,5 +115,3 @@ class CfSelectAvatarScreenState extends State<CfSelectAvatarScreen> {
   }
 
 }
-
- */

@@ -5,7 +5,6 @@ import 'cf_dice_widget.dart';
 import 'cf_players_widget.dart';
 import 'money_wheel.dart';
 
-/*
 class CfGamePage extends StatefulWidget {
   const CfGamePage({super.key});
 
@@ -122,5 +121,3 @@ class _CFGamePageState extends State<CfGamePage> {
   }
 
 }
-
- */

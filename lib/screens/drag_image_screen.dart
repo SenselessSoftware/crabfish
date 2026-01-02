@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../cf_constants.dart';
 
-/*
 void main() {
   runApp(const MyApp());
 }
@@ -319,5 +318,3 @@ class _MultiDragImageScreenState extends State<MultiDragImageScreen> {
     );
   }
 }
-
- */

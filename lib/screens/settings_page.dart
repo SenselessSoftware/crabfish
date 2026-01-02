@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/settings_service.dart';
 
-/*
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -194,6 +193,14 @@ class _SettingsPageState extends State<SettingsPage> {
             title: 'Triple Dice Winnings Multiplier: ',
             controller: _setting4Controller,
           ),
+          const Divider(),
+          SwitchListTile(
+            title: const Text('Integrate Money Wheel'),
+            value: settingsService.integrateMoneyWheel,
+            onChanged: (bool value) {
+              settingsService.updateIntegrateMoneyWheel(value);
+            },
+          ),
           const Divider(height: 32),
           ElevatedButton.icon(
             icon: const Icon(Icons.reorder),
@@ -230,5 +237,3 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 }
-
- */

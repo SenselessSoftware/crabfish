@@ -9,33 +9,34 @@ import 'package:path/path.dart' as p; // For path manipulation
 
 class SettingsService with ChangeNotifier {
   // Define keys for SharedPreferences
-  static const String _setting1Key = 'setting_int_1';
+  static const String _startingScoreKey = 'starting_score';
   static const String _setting2Key = 'setting_int_2';
   static const String _setting3Key = 'setting_int_3';
   static const String _setting4Key = 'setting_int_4';
+  static const String _integrateMoneyWheelKey = 'integrate_money_wheel';
 
   // Default values
-  int _setting1 = 20;    // starting money
+  int _startingScore = 20;    // starting money
   int _setting2 = 1;    // standard bet
   int _setting3 = 3;    // double dice payout multiplier
   int _setting4 = 10;   // triple dice payout multiplier
+  bool _integrateMoneyWheel = false;
 
   bool _isLoading = true; // To track if settings are being loaded
 
   // Getters for the settings
-  int get setting1 => _setting1;
+  int get startingScore => _startingScore;
   int get setting2 => _setting2;
   int get setting3 => _setting3;
   int get setting4 => _setting4;
+  bool get integrateMoneyWheel => _integrateMoneyWheel;
 
   bool get isLoading => _isLoading;
 
   static const String _profileImagePathKey = 'profile_image_path';
   File? _profileImageFile;
-  //bool _isLoading = true;
 
   File? get profileImageFile => _profileImageFile;
-  //bool get isLoading => _isLoading;
 
   SettingsService() {
     loadSettings();
@@ -48,26 +49,27 @@ class SettingsService with ChangeNotifier {
     notifyListeners(); // Notify UI that loading has started
 
     final prefs = await SharedPreferences.getInstance();
-    _setting1 = prefs.getInt(_setting1Key) ?? _setting1; // Use default if not found
+    _startingScore = prefs.getInt(_startingScoreKey) ?? _startingScore; // Use default if not found
     _setting2 = prefs.getInt(_setting2Key) ?? _setting2;
     _setting3 = prefs.getInt(_setting3Key) ?? _setting3;
     _setting4 = prefs.getInt(_setting4Key) ?? _setting4;
+    _integrateMoneyWheel = prefs.getBool(_integrateMoneyWheelKey) ?? _integrateMoneyWheel;
 
     _isLoading = false;
     notifyListeners(); // Notify UI that loading is complete and values are updated
     if (kDebugMode) {
-      print("Settings Loaded: $_setting1, $_setting2, $_setting3, $_setting4,");
+      print("Settings Loaded: $_startingScore, $_setting2, $_setting3, $_setting4, $_integrateMoneyWheel");
     }
   }
 
   // Update a specific setting and save it
-  Future<void> updateSetting1(int newValue) async {
-    _setting1 = newValue;
+  Future<void> updateStartingScore(int newValue) async {
+    _startingScore = newValue;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_setting1Key, newValue);
+    await prefs.setInt(_startingScoreKey, newValue);
     if (kDebugMode) {
-      print("Setting 1 Updated: $newValue");
+      print("Starting Score Updated: $newValue");
     }
   }
 
@@ -102,19 +104,31 @@ class SettingsService with ChangeNotifier {
     }
   }
 
+  Future<void> updateIntegrateMoneyWheel(bool newValue) async {
+    _integrateMoneyWheel = newValue;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_integrateMoneyWheelKey, newValue);
+    if (kDebugMode) {
+      print("Integrate Money Wheel Updated: $newValue");
+    }
+  }
+
   // Optional: Reset all settings to default and save
   Future<void> resetSettings() async {
-    _setting1 = 1; // Default value
+    _startingScore = 20; // Default value
     _setting2 = 1; // Default value
     _setting3 = 3; // Default value
     _setting4 = 10; // Default value
+    _integrateMoneyWheel = false;
     notifyListeners();
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_setting1Key, _setting1);
+    await prefs.setInt(_startingScoreKey, _startingScore);
     await prefs.setInt(_setting2Key, _setting2);
     await prefs.setInt(_setting3Key, _setting3);
     await prefs.setInt(_setting4Key, _setting4);
+    await prefs.setBool(_integrateMoneyWheelKey, _integrateMoneyWheel);
     if (kDebugMode) {
       print("Settings Reset");
     }

@@ -1,3 +1,4 @@
+import 'package:crabfish/models/settings_service.dart';
 import 'package:crabfish/providers/player_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../cf_constants.dart';
 import '../models/cf_game.dart';
 
-/*
 class DiceDisplay extends StatefulWidget {
   final List<String> imagePaths;
 
@@ -28,13 +28,14 @@ class _DiceDisplayState extends State<DiceDisplay> {
   void _handleRollButtonPressed() {
     final appState = Provider.of<AppState>(context, listen: false);
     final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+    final settingsService = Provider.of<SettingsService>(context, listen: false);
 
     if (_isRollButtonEnabled) {
       // Perform your action when the button is pressed
       if (kDebugMode) {
         print('Roll Button Pressed!');
       }
-      appState.rollDice(playerProvider);
+      appState.rollDice(playerProvider, settingsService);
 
       setState(() {
         _isRollButtonEnabled = false; // Disable the button
@@ -216,10 +217,11 @@ class _DiceDisplayState extends State<DiceDisplay> {
   Widget rollButton() {
     final appState = context.watch<AppState>();
     final playerProvider = context.watch<PlayerProvider>();
+    final settingsService = context.watch<SettingsService>();
 
     return ElevatedButton(
       onPressed: () {
-        appState.rollDice(playerProvider);
+        appState.rollDice(playerProvider, settingsService);
         if (mounted) { // Check if the widget is still in the tree
           setState(() {
 
@@ -239,5 +241,3 @@ class _DiceDisplayState extends State<DiceDisplay> {
     );
   }
 }
-
- */

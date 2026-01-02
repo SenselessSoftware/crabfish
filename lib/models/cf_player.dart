@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 import '../cf_constants.dart';
-
+/*
 class PlayerInGame with ChangeNotifier {
   String _playerName = Constants.unknownPlayer;
 
@@ -151,3 +151,5 @@ class PlayerInGame with ChangeNotifier {
     notifyListeners();
   }
 }
+
+ */

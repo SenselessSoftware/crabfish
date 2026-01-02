@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:crabfish/providers/player_provider.dart';
@@ -6,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/cf_game.dart';
 
-/*
 class FourImageDisplay extends StatefulWidget {
   const FourImageDisplay({super.key});
 
@@ -15,6 +15,51 @@ class FourImageDisplay extends StatefulWidget {
 }
 
 class _FourImageDisplayState extends State<FourImageDisplay> {
+  Map<int, List<int>> _bonusScores = {};
+  Map<int, int> _currentBonusIndex = {};
+  Map<int, Timer> _bonusTimers = {};
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final appState = context.watch<AppState>();
+    if (appState.bonusScores.isNotEmpty && _bonusScores.isEmpty) {
+      _bonusScores = Map.from(appState.bonusScores);
+      _startBonusDisplay();
+    }
+    if (appState.bonusScores.isEmpty && _bonusScores.isNotEmpty) {
+      _bonusScores.clear();
+    }
+  }
+
+  void _startBonusDisplay() {
+    _bonusScores.forEach((playerIndex, scores) {
+      if (scores.isNotEmpty) {
+        _currentBonusIndex[playerIndex] = 0;
+        _bonusTimers[playerIndex] = Timer.periodic(const Duration(seconds: 3), (timer) {
+          if (!mounted) {
+            timer.cancel();
+            return;
+          }
+          setState(() {
+            if (_currentBonusIndex[playerIndex]! < scores.length - 1) {
+              _currentBonusIndex[playerIndex] = _currentBonusIndex[playerIndex]! + 1;
+            } else {
+              timer.cancel();
+              _bonusScores.remove(playerIndex);
+            }
+          });
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _bonusTimers.values.forEach((timer) => timer.cancel());
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return OrientationBuilder(
@@ -88,41 +133,73 @@ class _FourImageDisplayState extends State<FourImageDisplay> {
     final playerChoiceImagePath = appState.getPlayerChoiceImage(index);
     final hasChoice = appState.hasChoiceImage(index);
 
-    if (kDebugMode) {
-      print("Player: $index, Image: ${player.imagePath}, Color: $playerColor, Choice: $playerChoiceImagePath");
+    int? bonusToShow;
+    if (_bonusScores.containsKey(index) && _currentBonusIndex.containsKey(index)) {
+      final scores = _bonusScores[index]!;
+      final bonusIndex = _currentBonusIndex[index]!;
+      if (scores.isNotEmpty && bonusIndex < scores.length) {
+        bonusToShow = scores[bonusIndex];
+      }
     }
 
-    return Stack(
-      alignment: Alignment.center,
+    return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            border: Border.all(color: playerColor, width: 8),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: SizedBox(
-            width: 120,
-            height: 120,
-            child: _buildPlayerImage(player.imagePath),
-          ),
-        ),
-        if (hasChoice && playerChoiceImagePath != null && playerChoiceImagePath.isNotEmpty)
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white, width: 2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: Image.asset(
-                playerChoiceImagePath,
-                fit: BoxFit.cover,
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                border: Border.all(color: playerColor, width: 8),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: SizedBox(
+                width: 120,
+                height: 120,
+                child: _buildPlayerImage(player.imagePath),
               ),
             ),
-          ),
+            if (hasChoice && playerChoiceImagePath != null && playerChoiceImagePath.isNotEmpty)
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white, width: 2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.asset(
+                    playerChoiceImagePath,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            if (bonusToShow != null)
+              Center(
+                child: Text(
+                  '+$bonusToShow',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 10.0,
+                        color: Colors.black,
+                        offset: Offset(5.0, 5.0),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '${player.name}: ${player.score}',
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
       ],
     );
   }
@@ -164,5 +241,3 @@ class _FourImageDisplayState extends State<FourImageDisplay> {
     );
   }
 }
-
- */

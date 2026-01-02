@@ -14,16 +14,15 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.senselesssoftware.crabfish.crabfish"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
-    compileSdk = 35
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_19
-        targetCompatibility = JavaVersion.VERSION_19
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_19
+        jvmTarget = JavaVersion.VERSION_17
     }
 
     defaultConfig {

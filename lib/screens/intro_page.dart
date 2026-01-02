@@ -3,7 +3,6 @@ import 'package:introduction_screen/introduction_screen.dart';
 
 import '../cf_constants.dart';
 
-/*
 class IntroPage extends StatefulWidget {
   const IntroPage({super.key});
 
@@ -99,5 +98,3 @@ class _IntroPageState extends State<IntroPage> {
     );
   }
 }
-
- */

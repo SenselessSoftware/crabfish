@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../cf_constants.dart';
 import '../models/cf_game.dart';
 
-/*
 class CfBoardWidget extends StatefulWidget {
   final List<String> imagePaths;
   const CfBoardWidget({super.key, required this.imagePaths});
@@ -126,6 +125,4 @@ class _CfBoardWidgetState extends State<CfBoardWidget> {
   }
 
 }
-
- */
 

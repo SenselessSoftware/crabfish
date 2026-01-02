@@ -1,9 +1,11 @@
-
 import 'dart:io';
 import 'dart:math';
+import 'package:crabfish/models/settings_service.dart';
 import 'package:crabfish/models/smart_image.dart';
+import 'package:crabfish/providers/player_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:player_model/player.dart';
 import '../cf_constants.dart';
 
 class SelectionData {
@@ -52,51 +54,53 @@ class SelectionData {
 // --- ChangeNotifier for State Management ---
 class AppState extends ChangeNotifier {
   final SelectionData _selectionData = SelectionData();
+  Map<int, List<int>> bonusScores = {};
 
   SelectionData get selectionData => _selectionData;
 
-  void updatePlayerName0(String newText) {
-    _selectionData.playerName0 = newText;
-    notifyListeners(); // Notify widgets listening to this state
+  void clearBonusScores() {
+    bonusScores.clear();
+    notifyListeners();
   }
 
-  void updatePlayerName1(String newText) {
-    _selectionData.playerName1 = newText;
-    notifyListeners(); // Notify widgets listening to this state
+  int _getBonusSpinScore() {
+    final scores = [0, 20, 50, 20, 100, 20, 50, 20, 50, 20, 500, 20, 50, 20, 100, 20, 50, 20, 50, 20];
+    final random = Random();
+    return scores[random.nextInt(scores.length)];
   }
 
-  void updatePlayerName2(String newText) {
-    _selectionData.playerName2 = newText;
-    notifyListeners(); // Notify widgets listening to this state
-  }
-
-  void updatePlayerName3(String newText) {
-    _selectionData.playerName3 = newText;
-    notifyListeners(); // Notify widgets listening to this state
-  }
-
-  void rollDice() {
-    // For simplicity, let's assume a standard 6-sided die
+  void rollDice(PlayerProvider playerProvider, SettingsService settingsService) {
     _selectionData.dice1 = _rollSingleDice();
     _selectionData.dice2 = _rollSingleDice();
     _selectionData.dice3 = _rollSingleDice();
+    clearBonusScores();
 
-    // update player totals
-    addToTotalForPlayer(0, getWinningsForPlayer(0));
-    addToTotalForPlayer(1, getWinningsForPlayer(1));
-    addToTotalForPlayer(2, getWinningsForPlayer(2));
-    addToTotalForPlayer(3, getWinningsForPlayer(3));
+    for (int i = 0; i < playerProvider.players.length; i++) {
+      int winnings = getWinningsForPlayer(i);
+      if (settingsService.integrateMoneyWheel) {
+        int matches = getNumberOfMatchesForPlayer(i);
+        if (matches > 0) {
+          bonusScores[i] = [];
+          for (int j = 0; j < matches; j++) {
+            int bonus = _getBonusSpinScore();
+            winnings += bonus;
+            bonusScores[i]!.add(bonus);
+          }
+        }
+      }
+      addToTotalForPlayer(i, winnings, playerProvider);
+    }
+
     _selectionData.gameState = 1;
-
     notifyListeners();
   }
 
   void clearDice() {
-    // For simplicity, let's assume a standard 6-sided die
     _selectionData.dice1 = 7;
     _selectionData.dice2 = 7;
     _selectionData.dice3 = 7;
     _selectionData.gameState = 0;
+    clearBonusScores();
     notifyListeners();
   }
 
@@ -105,128 +109,12 @@ class AppState extends ChangeNotifier {
     return random.nextInt(6) + 1;
   }
 
-  // init player images to blank
-  void initPlayerImages() {
-    _selectionData.playerImage0 ??= SmartImage(userID: 0, assetPath: Constants.avatar00);
-    _selectionData.playerImage1 ??= SmartImage(userID: 1, assetPath: Constants.avatar00);
-    _selectionData.playerImage2 ??= SmartImage(userID: 2, assetPath: Constants.avatar00);
-    _selectionData.playerImage3 ??= SmartImage(userID: 3, assetPath: Constants.avatar00);
-  }
-
-  // Optional: Method to clear selection
-  void clearSelection() {
-    _selectionData.playerName0 = "none";
-    _selectionData.playerName1 = "none";
-    _selectionData.playerName2 = "none";
-    _selectionData.playerName3 = "none";
-    _selectionData.dice1 = 1; // Reset dice to default or a specific value
-    _selectionData.dice2 = 1;
-    _selectionData.dice3 = 1;
-    _selectionData.playerTotal0 = _selectionData.startingMoney;
-    _selectionData.playerTotal1 = _selectionData.startingMoney;
-    _selectionData.playerTotal2 = _selectionData.startingMoney;
-    _selectionData.playerTotal3 = _selectionData.startingMoney;
-    _selectionData.playerImage0Choice = "";
-    _selectionData.playerImage1Choice = "";
-    _selectionData.playerImage2Choice = "";
-    _selectionData.playerImage3Choice = "";
-    notifyListeners();
-  }
-
-
-
-  Widget getPlayerImage(int playerNumber) {
-    Widget playerImage;
-
-    if (kDebugMode) {
-      print('getplayerImage:');
-    }
-
-    switch (playerNumber) {
-      case 0:
-        playerImage = _selectionData.playerImage0 as Widget;
-        if (kDebugMode) {
-          print('playerNum: $playerNumber');
-        }
-        break;
-      case 1:
-        playerImage = _selectionData.playerImage1 as Widget;
-        if (kDebugMode) {
-          print('playerNum: $playerNumber');
-        }
-        break;
-        case 2:
-        playerImage = _selectionData.playerImage2 as Widget;
-        if (kDebugMode) {
-          print('playerNum: $playerNumber');
-        }
-        break;
-      case 3:
-        playerImage = _selectionData.playerImage3 as Widget;
-        if (kDebugMode) {
-          print('playerNum: $playerNumber');
-        }
-        break;
-      default:
-        playerImage = SmartImage(userID: playerNumber, assetPath: Constants.avatar00);
-    }
-
-    return playerImage;
-  }
-
-
-  String getPlayerName(int playerNumber) {
-    String playerName = "none";
-
-    switch (playerNumber) {
-      case 0:
-        playerName = _selectionData.playerName0;
-        break;
-      case 1:
-        playerName = _selectionData.playerName1;
-        break;
-      case 2:
-        playerName = _selectionData.playerName2;
-        break;
-      case 3:
-        playerName = _selectionData.playerName3;
-        break;
-    }
-
-    return playerName;
-  }
-
-
-  void updatePlayerName(int playerNumber, String newName) {
-
-    switch (playerNumber) {
-      case 0:
-        updatePlayerName0(newName);
-        break;
-      case 1:
-        updatePlayerName1(newName);
-        break;
-      case 2:
-        updatePlayerName2(newName);
-        break;
-      case 3:
-        updatePlayerName3(newName);
-        break;
-    }
-  }
-
-
   void clearPlayerChoices() {
-
     _selectionData.playerImage0Choice = "";
     _selectionData.playerImage1Choice = "";
     _selectionData.playerImage2Choice = "";
     _selectionData.playerImage3Choice = "";
-
     notifyListeners();
-    if (kDebugMode) {
-      print('clearPlayerChoices');
-    }
   }
 
   void setPlayerChoice(int playNum, String boardImagePath ) {
@@ -244,6 +132,7 @@ class AppState extends ChangeNotifier {
           _selectionData.playerImage3Choice = boardImagePath ;
         break;
     }
+    notifyListeners();
   }
 
   String? getPlayerChoiceImage(int playNum) {
@@ -307,45 +196,17 @@ class AppState extends ChangeNotifier {
     return  playerColor;
   }
 
-  int getTotalForPlayer(int playerNum) {
-    int playerTotal = 0;
-
-    switch (playerNum) {
-      case 0:
-        playerTotal = _selectionData.playerTotal0;
-        break;
-      case 1:
-        playerTotal = _selectionData.playerTotal1;
-        break;
-      case 2:
-        playerTotal = _selectionData.playerTotal2;
-        break;
-      case 3:
-        playerTotal = _selectionData.playerTotal3;
-        break;
-      default:
-        playerTotal = 0;
+  void addToTotalForPlayer(int playerNum, int amountToAdd, PlayerProvider playerProvider) {
+    if (playerNum < playerProvider.players.length) {
+      final player = playerProvider.players[playerNum];
+      final updatedPlayer = Player(
+        id: player.id,
+        name: player.name,
+        imagePath: player.imagePath,
+        score: player.score + amountToAdd,
+      );
+      playerProvider.updatePlayer(playerNum, updatedPlayer);
     }
-    return playerTotal;
-  }
-
-  void addToTotalForPlayer(int playerNum, int amountToAdd) {
-
-    switch (playerNum) {
-      case 0:
-        _selectionData.playerTotal0 = _selectionData.playerTotal0 + amountToAdd;
-        break;
-      case 1:
-        _selectionData.playerTotal1 = _selectionData.playerTotal1 + amountToAdd;
-        break;
-      case 2:
-        _selectionData.playerTotal2 = _selectionData.playerTotal2 + amountToAdd;
-        break;
-      case 3:
-        _selectionData.playerTotal3 = _selectionData.playerTotal3 + amountToAdd;
-        break;
-    }
-    notifyListeners();
   }
 
 
@@ -445,67 +306,30 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setPlayerImageFile(int playerNum, File playerImage) {
-    switch (playerNum) {
-      case 0:
-        _selectionData.playerImage0 = SmartImage(userID: playerNum, imageFile: playerImage);
-        break;
-      case 1:
-        _selectionData.playerImage1 = SmartImage(userID: playerNum, imageFile: playerImage);
-        break;
-      case 2:
-        _selectionData.playerImage2 = SmartImage(userID: playerNum, imageFile: playerImage);
-        break;
-      case 3:
-        _selectionData.playerImage3 = SmartImage(userID: playerNum, imageFile: playerImage);
-        break;
-    }
-  }
-
-
-  void setPlayerImageAsset(int playerNum, String assetPath) {
-    switch (playerNum) {
-      case 0:
-        _selectionData.playerImage0 = SmartImage(userID: playerNum, assetPath: assetPath);
-        break;
-      case 1:
-        _selectionData.playerImage1 = SmartImage(userID: playerNum, assetPath: assetPath);
-        break;
-      case 2:
-        _selectionData.playerImage2 = SmartImage(userID: playerNum, assetPath: assetPath);
-        break;
-      case 3:
-        _selectionData.playerImage3 = SmartImage(userID: playerNum, assetPath: assetPath);
-        break;
-    }
-  }
-
   bool hasChoiceImage(int playerNum) {
     bool hasChoice = false;
     switch (playerNum) {
       case 0:
         if (_selectionData.playerImage0Choice != "") {
           hasChoice = true;
-        };
+        }
         break;
       case 1:
         if (_selectionData.playerImage1Choice != "") {
           hasChoice = true;
-        };
+        }
         break;
       case 2:
         if (_selectionData.playerImage2Choice != "") {
           hasChoice = true;
-        };
+        }
         break;
       case 3:
         if (_selectionData.playerImage3Choice != "") {
           hasChoice = true;
-        };
+        }
         break;
     }
     return hasChoice;
   }
-
-
 }

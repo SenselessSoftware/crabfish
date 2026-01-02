@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fortune_wheel/flutter_fortune_wheel.dart';
 
-/*
+
 class MoneyPage extends StatefulWidget {
   const MoneyPage({super.key});
 
@@ -269,5 +269,3 @@ class MoneyPageState extends State<MoneyPage> {
   }
 
 }
-
- */

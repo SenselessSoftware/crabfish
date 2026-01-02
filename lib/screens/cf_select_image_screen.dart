@@ -1,5 +1,5 @@
 import 'package:crabfish/models/settings_service.dart';
-import 'package:crabfish/views/profile_settings_page.dart';
+import 'package:crabfish/screens/profile_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/cf_game.dart';
