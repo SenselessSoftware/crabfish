@@ -18,6 +18,8 @@ class _FourImageDisplayState extends State<FourImageDisplay> {
   Map<int, List<int>> _bonusScores = {};
   Map<int, int> _currentBonusIndex = {};
   Map<int, Timer> _bonusTimers = {};
+  Map<int, Timer> _flashTimers = {};
+  Map<int, bool> _showBonusHighlight = {};
 
   @override
   void didChangeDependencies() {
@@ -28,7 +30,14 @@ class _FourImageDisplayState extends State<FourImageDisplay> {
       _startBonusDisplay();
     }
     if (appState.bonusScores.isEmpty && _bonusScores.isNotEmpty) {
+      _bonusTimers.values.forEach((timer) => timer.cancel());
+      _flashTimers.values.forEach((timer) => timer.cancel());
+      _bonusTimers.clear();
+      _flashTimers.clear();
       _bonusScores.clear();
+      _currentBonusIndex.clear();
+      _showBonusHighlight.clear();
+      setState(() {});
     }
   }
 
@@ -36,6 +45,8 @@ class _FourImageDisplayState extends State<FourImageDisplay> {
     _bonusScores.forEach((playerIndex, scores) {
       if (scores.isNotEmpty) {
         _currentBonusIndex[playerIndex] = 0;
+        _showBonusHighlight[playerIndex] = true;
+
         _bonusTimers[playerIndex] = Timer.periodic(const Duration(seconds: 3), (timer) {
           if (!mounted) {
             timer.cancel();
@@ -46,8 +57,20 @@ class _FourImageDisplayState extends State<FourImageDisplay> {
               _currentBonusIndex[playerIndex] = _currentBonusIndex[playerIndex]! + 1;
             } else {
               timer.cancel();
+              _flashTimers[playerIndex]?.cancel();
               _bonusScores.remove(playerIndex);
+              _showBonusHighlight.remove(playerIndex);
             }
+          });
+        });
+
+        _flashTimers[playerIndex] = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+          if (!mounted) {
+            timer.cancel();
+            return;
+          }
+          setState(() {
+            _showBonusHighlight[playerIndex] = !(_showBonusHighlight[playerIndex] ?? true);
           });
         });
       }
@@ -57,6 +80,7 @@ class _FourImageDisplayState extends State<FourImageDisplay> {
   @override
   void dispose() {
     _bonusTimers.values.forEach((timer) => timer.cancel());
+    _flashTimers.values.forEach((timer) => timer.cancel());
     super.dispose();
   }
 
@@ -115,11 +139,15 @@ class _FourImageDisplayState extends State<FourImageDisplay> {
 
   Widget _buildPlayerImage(String? imagePath) {
     if (imagePath == null || imagePath.isEmpty) {
-      return Image.asset('assets/images/avatars/blankPlayer.jpg', fit: BoxFit.cover);
+      return Image.asset('assets/images/avatars/blankPlayer.jpg', package: 'player_model', fit: BoxFit.cover);
     }
 
     if (imagePath.startsWith('assets/')) {
-      return Image.asset(imagePath, fit: BoxFit.cover);
+      if (imagePath.contains('avatars/')) {
+        return Image.asset(imagePath, package: 'player_model', fit: BoxFit.cover);
+      } else {
+        return Image.asset(imagePath, fit: BoxFit.cover);
+      }
     } else {
       return Image.file(File(imagePath), fit: BoxFit.cover);
     }
@@ -128,10 +156,19 @@ class _FourImageDisplayState extends State<FourImageDisplay> {
   Widget _buildDraggableChild(int index) {
     final playerProvider = context.watch<PlayerProvider>();
     final appState = context.watch<AppState>();
-    final playerColor = appState.getColorForPlayer(index);
     final player = playerProvider.players[index];
     final playerChoiceImagePath = appState.getPlayerChoiceImage(index);
     final hasChoice = appState.hasChoiceImage(index);
+    final matchColor = appState.getColorForPlayer(index);
+
+    final isBonusActive = _bonusScores.containsKey(index);
+    final showHighlight = _showBonusHighlight[index] ?? true;
+    Color borderColor;
+    if (isBonusActive) {
+      borderColor = showHighlight ? matchColor : Colors.transparent;
+    } else {
+      borderColor = matchColor;
+    }
 
     int? bonusToShow;
     if (_bonusScores.containsKey(index) && _currentBonusIndex.containsKey(index)) {
@@ -150,7 +187,7 @@ class _FourImageDisplayState extends State<FourImageDisplay> {
             Container(
               padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
-                border: Border.all(color: playerColor, width: 8),
+                border: Border.all(color: borderColor, width: 8),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SizedBox(
@@ -179,11 +216,11 @@ class _FourImageDisplayState extends State<FourImageDisplay> {
               Center(
                 child: Text(
                   '+$bonusToShow',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [
+                    color: matchColor,
+                    shadows: const [
                       Shadow(
                         blurRadius: 10.0,
                         color: Colors.black,

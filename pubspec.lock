@@ -508,8 +508,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "v1.0.1"
-      resolved-ref: e146c856488c7f6e0d36a1feeec6b2bf78068d15
+      ref: HEAD
+      resolved-ref: "8387a589518b689a481f1b93b894d7a8ea988950"
       url: "https://github.com/senselesssoftware/player_model.git"
     source: git
     version: "0.0.1"

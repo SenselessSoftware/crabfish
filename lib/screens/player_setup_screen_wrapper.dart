@@ -1,13 +1,16 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:player_model/screens/player_setup_screen.dart' as pkg;
+
 import 'package:crabfish/models/cf_game.dart';
 import 'package:crabfish/models/settings_service.dart';
 import 'package:crabfish/screens/cf_game_page.dart';
 import 'package:crabfish/screens/settings_page.dart';
-
 import '../providers/player_provider.dart';
-import 'package:flutter/material.dart';
-import 'package:player_model/player.dart';
-import 'package:player_model/screens/player_setup_screen.dart' as pkg;
-import 'package:provider/provider.dart';
+
+
+
 
 class PlayerSetupScreenWrapper extends StatelessWidget {
   const PlayerSetupScreenWrapper({super.key});
