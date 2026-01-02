@@ -83,31 +83,7 @@ flutter:
     - assets/images/cfgame/rollButtonDisabled.png
     - assets/images/cfgame/clearButtonEnabled.png
     - assets/images/cfgame/clearButtonDisabled.png
-    - assets/images/avatars/blankPlayer.jpg
-    - assets/images/avatars/female01.png
-    - assets/images/avatars/female02.png
-    - assets/images/avatars/female03.png
-    - assets/images/avatars/female04.png
-    - assets/images/avatars/female05.png
-    - assets/images/avatars/female06.png
-    - assets/images/avatars/female07.png
-    - assets/images/avatars/female08.png
-    - assets/images/avatars/female09.png
-    - assets/images/avatars/female10.png
-    - assets/images/avatars/female11.png
-    - assets/images/avatars/female12.png
-    - assets/images/avatars/male01.png
-    - assets/images/avatars/male02.png
-    - assets/images/avatars/male03.png
-    - assets/images/avatars/male04.png
-    - assets/images/avatars/male05.png
-    - assets/images/avatars/male06.png
-    - assets/images/avatars/male07.png
-    - assets/images/avatars/male08.png
-    - assets/images/avatars/male09.png
-    - assets/images/avatars/male10.png
-    - assets/images/avatars/male11.png
-    - assets/images/avatars/male12.png
+
 
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
