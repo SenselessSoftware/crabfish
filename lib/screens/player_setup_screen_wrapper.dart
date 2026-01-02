@@ -9,9 +9,6 @@ import 'package:crabfish/screens/cf_game_page.dart';
 import 'package:crabfish/screens/settings_page.dart';
 import '../providers/player_provider.dart';
 
-
-
-
 class PlayerSetupScreenWrapper extends StatelessWidget {
   const PlayerSetupScreenWrapper({super.key});
 
